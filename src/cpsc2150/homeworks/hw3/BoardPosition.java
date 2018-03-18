@@ -7,7 +7,7 @@ package cpsc2150.homeworks.hw3;
 
 /**
  * This is an entity class which it's sole responsibility is to 
- * hold a player's position information in the GameBoard.
+ * hold a player's position information in the GameBoardFast.
  * 
  * @invariant row >= 0
  *            and column >= 0

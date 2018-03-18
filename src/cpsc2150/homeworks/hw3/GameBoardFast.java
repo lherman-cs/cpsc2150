@@ -11,36 +11,47 @@ import java.util.Arrays;
  * This is an entity class which it's sole responsibility is to
  * keep players' marks in the board and some logics of the game.
  * 
- * @invariant NEED_TO_WIN = 5
- *            and SIZE = 8
+ * Correspondence: this = board[0...numRows][0...numCols]. board[0][0] is top left
+ *                 NUM_ROWS = numRows
+ *                 NUM_COLS = numCols
+ *                 
+ * @invariant this.numRows, this.numCols, and this.needToWin will never change
  *            and board will never be destroyed or recreated
  */
-public class GameBoard {
-    private final static int NEED_TO_WIN = 5;
-    private final static int SIZE = 8;
-
+public class GameBoardFast implements IGameBoard {
+    private final int numRows;
+    private final int numCols;
+    private final int needToWin;
     private final char[][] board;
 
     /**
      * Construct an instance and initialize the 2-D array char board with ' '
      * 
-     * @ensures board = a new 2-D char array filled with ' ' character
+     * @ensures this.numRows = numRows
+     *          and this.numCols = numCols
+     *          and this.needToWin = needToWin
+     *          and board = a new 2-D char array filled with ' ' character
      */
-    public GameBoard() {
+    public GameBoardFast(int numRows, int numCols, int needToWin) {
+        this.numRows = numRows;
+        this.numCols = numCols;
+        this.needToWin = needToWin;
+
         // Initialize the board with ' ' on every law
-        board = new char[SIZE][SIZE];
-        for (int row = 0; row < SIZE; row++)
-            for (int col = 0; col < SIZE; col++)
+        board = new char[this.numRows][this.numCols];
+        for (int row = 0; row < this.numRows; row++)
+            for (int col = 0; col < this.numCols; col++)
                 board[row][col] = ' ';
     }
 
     public boolean checkSpace(BoardPosition pos) {
-        return (pos.getRow() >= 0 && pos.getRow() < SIZE) && (pos.getColumn() >= 0 && pos.getColumn() < SIZE)
+        return (pos.getRow() >= 0 && pos.getRow() < this.numRows)
+                && (pos.getColumn() >= 0 && pos.getColumn() < this.numCols)
                 && board[pos.getRow()][pos.getColumn()] == ' ';
     }
 
-    public void placeMaker(BoardPosition marker) {
-        board[marker.getRow()][marker.getColumn()] = marker.getPlayer();
+    public void placeMarker(BoardPosition lastPos) {
+        board[lastPos.getRow()][lastPos.getColumn()] = lastPos.getPlayer();
     }
 
     public boolean checkForWinner(BoardPosition lastPos) {
@@ -48,8 +59,8 @@ public class GameBoard {
     }
 
     public boolean checkForDraw() {
-        for (int row = 0; row < SIZE; row++)
-            for (int col = 0; col < SIZE; col++)
+        for (int row = 0; row < this.numRows; row++)
+            for (int col = 0; col < this.numCols; col++)
                 if (board[row][col] == ' ')
                     return false;
 
@@ -68,15 +79,18 @@ public class GameBoard {
     public String toString() {
         StringBuilder builder = new StringBuilder();
 
-        builder.append(" ");
-        for (int col = 0; col < SIZE; col++)
-            builder.append(" " + col);
+        builder.append("  ");
+        for (int col = 0; col < this.numCols; col++) {
+            if (col < 10)
+                builder.append(" ");
+            builder.append(col + "|");
+        }
         builder.append("\n");
 
-        for (int row = 0; row < SIZE; row++) {
+        for (int row = 0; row < this.numRows; row++) {
             builder.append(row + "|");
-            for (int col = 0; col < SIZE; col++)
-                builder.append(board[row][col] + "|");
+            for (int col = 0; col < this.numCols; col++)
+                builder.append(board[row][col] + " |");
             builder.append("\n");
         }
 
@@ -84,7 +98,7 @@ public class GameBoard {
     }
 
     /**
-     * An override method for comparing between two GameBoard's instances
+     * An override method for comparing between two GameBoardFast's instances
      * 
      * @param o is the other instance that needs to be compared
      * @requires o is an object
@@ -101,29 +115,29 @@ public class GameBoard {
             return true;
         }
 
-        // Return false if the object is not an instance of GameBoard
-        if (!(o instanceof GameBoard)) {
+        // Return false if the object is not an instance of GameBoardFast
+        if (!(o instanceof GameBoardFast)) {
             return false;
         }
 
         // typecast o to BoardPosition so that we can compare data members
-        GameBoard other = (GameBoard) o;
+        GameBoardFast other = (GameBoardFast) o;
 
         // Compare the data members and return accordingly
         return Arrays.deepEquals(this.board, other.board);
     }
 
     /**
-     * checks to see if the last marker placed resulted in NEED_TO_WIN in a row
+     * checks to see if the last marker placed resulted in this.needToWin in a row
      * horizontally. Returns true if it does, otherwise false
      * 
      * @param lastPos is the position that needs to be checked
      * @requires lastPos is not NULL
-     *           0 <= lastPos.getRow(), lastPos.getColumn() < SIZE
+     *           0 <= lastPos.getRow() < this.numRows and 0 <= lastPos.getColumn() < this.numCols
      * @ensures board's elements will not change
      *          and checkHorizontalWin returns true if the lastPos makes 
-     *          NEED_TO_WIN in a row horizontally with the same lastPos' mark.
-     * @return true if the lastPos makes NEED_TO_WIN in a row horizontally with the same 
+     *          this.needToWin in a row horizontally with the same lastPos' mark.
+     * @return true if the lastPos makes this.needToWin in a row horizontally with the same 
      *         lastPos' mark
      */
     private boolean checkHorizontalWin(BoardPosition lastPos) {
@@ -137,9 +151,9 @@ public class GameBoard {
 
         // Check the right side
         int col = lastPos.getColumn() + 1;
-        while (col < SIZE && board[row][col] == player) {
+        while (col < this.numCols && board[row][col] == player) {
             counter++;
-            if (counter == NEED_TO_WIN)
+            if (counter == this.needToWin)
                 return true;
             col++;
         }
@@ -148,7 +162,7 @@ public class GameBoard {
         col = lastPos.getColumn() - 1;
         while (col >= 0 && board[row][col] == player) {
             counter++;
-            if (counter == NEED_TO_WIN)
+            if (counter == this.needToWin)
                 return true;
             col--;
         }
@@ -157,16 +171,16 @@ public class GameBoard {
     }
 
     /**
-     * checks to see if the last marker placed resulted in NEED_TO_WIN in a row
+     * checks to see if the last marker placed resulted in this.needToWin in a row
      * vertically. Returns true if it does, otherwise false
      * 
      * @param lastPos is the position that needs to be checked
      * @requires lastPos is not NULL
-     *           0 <= lastPos.getRow(), lastPos.getColumn() < SIZE
+     *           0 <= lastPos.getRow() < this.numRows and 0 <= lastPos.getColumn() < this.numCols
      * @ensures board's elements will not change
      *          and checkVerticalWin returns true if the lastPos makes 
-     *          NEED_TO_WIN in a row vertically with the same lastPos' mark.
-     * @return true if the lastPos makes NEED_TO_WIN in a row vertically with the same 
+     *          this.needToWin in a row vertically with the same lastPos' mark.
+     * @return true if the lastPos makes this.needToWin in a row vertically with the same 
      *         lastPos' mark
      */
     private boolean checkVerticalWin(BoardPosition lastPos) {
@@ -180,9 +194,9 @@ public class GameBoard {
 
         // Check the lower side
         int row = lastPos.getRow() + 1;
-        while (row < SIZE && board[row][col] == player) {
+        while (row < this.numRows && board[row][col] == player) {
             counter++;
-            if (counter == NEED_TO_WIN)
+            if (counter == this.needToWin)
                 return true;
             row++;
         }
@@ -191,7 +205,7 @@ public class GameBoard {
         row = lastPos.getRow() - 1;
         while (row >= 0 && board[row][col] == player) {
             counter++;
-            if (counter == NEED_TO_WIN)
+            if (counter == this.needToWin)
                 return true;
             row--;
         }
@@ -200,16 +214,16 @@ public class GameBoard {
     }
 
     /**
-     * checks to see if the last marker placed resulted in NEED_TO_WIN in a row
+     * checks to see if the last marker placed resulted in this.needToWin in a row
      * diagonally. Returns true if it does, otherwise false
      *
      * @param lastPos is the position that needs to be checked
      * @requires lastPos is not NULL
-     *           0 <= lastPos.getRow(), lastPos.getColumn() < SIZE
+     *           0 <= lastPos.getRow() < this.numRows and 0 < lastPos.getColumn() < this.numCols
      * @ensures board's elements will not change
      *          and checkDiagonalWin returns true if the lastPos makes
-     *          NEED_TO_WIN in a row diagonally with the same lastPos' mark
-     * @return true if the lastPos makes NEED_TO_WIN in a row diagonally with
+     *          this.needToWin in a row diagonally with the same lastPos' mark
+     * @return true if the lastPos makes this.needToWin in a row diagonally with
      *         the same lastPos' mark
      */
     private boolean checkDiagonalWin(BoardPosition lastPos) {
@@ -222,9 +236,9 @@ public class GameBoard {
         // Check the slash shape: "/"
         row = lastPos.getRow() - 1;
         col = lastPos.getColumn() + 1;
-        while (row >= 0 && col < SIZE && board[row][col] == player) {
+        while (row >= 0 && col < this.numCols && board[row][col] == player) {
             counter++;
-            if (counter == NEED_TO_WIN)
+            if (counter == this.needToWin)
                 return true;
             row--;
             col++;
@@ -232,9 +246,9 @@ public class GameBoard {
 
         row = lastPos.getRow() + 1;
         col = lastPos.getColumn() - 1;
-        while (row < SIZE && col >= 0 && board[row][col] == player) {
+        while (row < this.numRows && col >= 0 && board[row][col] == player) {
             counter++;
-            if (counter == NEED_TO_WIN)
+            if (counter == this.needToWin)
                 return true;
             row++;
             col--;
@@ -247,7 +261,7 @@ public class GameBoard {
         col = lastPos.getColumn() - 1;
         while (row >= 0 && col >= 0 && board[row][col] == player) {
             counter++;
-            if (counter == NEED_TO_WIN)
+            if (counter == this.needToWin)
                 return true;
             row--;
             col--;
@@ -255,9 +269,9 @@ public class GameBoard {
 
         row = lastPos.getRow() + 1;
         col = lastPos.getColumn() + 1;
-        while (row < SIZE && col < SIZE && board[row][col] == player) {
+        while (row < this.numRows && col < this.numCols && board[row][col] == player) {
             counter++;
-            if (counter == NEED_TO_WIN)
+            if (counter == this.needToWin)
                 return true;
             row++;
             col++;
