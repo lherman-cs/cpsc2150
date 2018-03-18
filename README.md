@@ -1,1 +1,1 @@
-# extended-tic-tac-toe
+# cpsc2150
