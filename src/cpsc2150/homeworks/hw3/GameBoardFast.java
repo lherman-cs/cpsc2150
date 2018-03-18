@@ -167,7 +167,7 @@ public class GameBoardFast implements IGameBoard {
             col--;
         }
 
-        return false;
+        return counter == this.needToWin;
     }
 
     /**
@@ -210,7 +210,7 @@ public class GameBoardFast implements IGameBoard {
             row--;
         }
 
-        return false;
+        return counter == this.needToWin;
     }
 
     /**
@@ -277,6 +277,6 @@ public class GameBoardFast implements IGameBoard {
             col++;
         }
 
-        return false;
+        return counter == this.needToWin;
     }
 }
