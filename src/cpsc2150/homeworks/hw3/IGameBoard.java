@@ -35,7 +35,7 @@ public interface IGameBoard {
      *
      * @param marker is the position needs to be marked in the board.
      * @requires marker is not NULL
-     *           and 0 <= marker.getRow() < NUM_ROWS and 0 <= marker.getColumn() < NUM_COLS
+     *           and checkSpace(lastPos) == true
      * @ensures board[marker.getRow()][marker.getColumn()] = marker.getPlayer();
      *          board at row = marker.getRow(), column = marker.getColumn() will
      *          be marked with marker.getPlayer()
