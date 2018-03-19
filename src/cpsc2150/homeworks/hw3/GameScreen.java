@@ -127,6 +127,9 @@ public class GameScreen {
         case "f":
             board = new GameBoardFast(numRows, numCols, needToWin);
             break;
+        case "m":
+            board = new GameBoardMem(numRows, numCols, needToWin);
+            break;
         default:
             break;
         }
@@ -160,12 +163,14 @@ public class GameScreen {
         if (board.checkSpace(pos)) {
             if (board.checkForWinner(pos))
                 System.out.println("Player " + player + " wins!");
-            else if (board.checkForDraw())
-                System.out.println("The game has been drawn");
             else {
                 board.placeMarker(pos);
-                System.out.println(board.toString());
-                play(turn + 1);
+                if(board.checkForDraw())
+                    System.out.println("The game has been drawn");
+                else {
+                    System.out.println(board.toString());
+                    play(turn + 1);
+                }
             }
         } else {
             System.out.println(board.toString());
