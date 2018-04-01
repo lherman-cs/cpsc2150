@@ -161,8 +161,11 @@ public class GameScreen {
 
         pos = new BoardPosition(row, col, player);
         if (board.checkSpace(pos)) {
-            if (board.checkForWinner(pos))
+            if (board.checkForWinner(pos)){
+                board.placeMarker(pos);
+                System.out.println(board.toString());
                 System.out.println("Player " + player + " wins!");
+            }
             else {
                 board.placeMarker(pos);
                 if(board.checkForDraw())
