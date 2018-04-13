@@ -44,7 +44,7 @@ public class GameSetupController {
             errorMsg += "Rows must be between 1 and " + max_size;
         }
 
-        if(cols < 1 || cols > IGameBoard.MAX_SIZE)
+        if(cols < 1 || cols > max_size)
         {
             errorMsg += "Columns must be between 1 and " + max_size;
         }
